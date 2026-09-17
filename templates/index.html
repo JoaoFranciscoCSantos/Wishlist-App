@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>A minha Wishlist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>A minha Wishlist</h1>
+
+    <a href="{{ url_for('add_form') }}">+ Adicionar item</a>
+
+    <div class="item-list">
+        {% for item in items %}
+            <div class="item-card">
+                <h3>{{ item["name"] }}</h3>
+                <p>Categoria: {{ item["category"] }}</p>
+                <p>Preço: {{ item["price"] }} €</p>
+                {% if item["url"] %}
+                    <p><a href="{{ item['url'] }}" target="_blank">Ver produto</a></p>
+                {% endif %}
+                {% if item["notes"] %}
+                    <p>{{ item["notes"] }}</p>
+                {% endif %}
+                <p>Prioridade: {{ item["priority"] }}</p>
+
+                <form action="{{ url_for('delete_item', item_id=item['id']) }}" method="POST" style="display:inline;">
+                    <button type="submit">Apagar</button>
+                </form>
+                <a href="{{ url_for('edit_form', item_id=item.id) }}">Editar</a>
+            </div>
+        {% else %}
+            <p>A tua wishlist está vazia. <a href="{{ url_for('add_form') }}">Adiciona o primeiro item</a>.</p>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

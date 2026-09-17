@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS items(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    category TEXT NOT NULL,
+    price REAL,
+    url TEXT,
+    image_url TEXT,
+    notes TEXT,
+    priority INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS savings(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    amount REAL NOT NULL,
+    date TEXT DEFAULT CURRENT_TIMESTAMP
+);
