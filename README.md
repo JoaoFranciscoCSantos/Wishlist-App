@@ -9,7 +9,7 @@ Guardar tudo o que quero comprar/fazer num só sítio, acompanhar quanto já ten
 ## Roteiro
 
 - [x] **Fase 1 — MVP local:** base de dados + site simples onde adiciono itens manualmente (CRUD completo + CSS)
-- [ ] **Fase 2 — Orçamento:** mealheiro único (adicionar/retirar dinheiro), compra de itens a debitar do saldo, e sugestão de compra baseada em prioridade + orçamento (algoritmo de knapsack 0/1)
+- [x] **Fase 2 — Orçamento:** mealheiro único (adicionar/retirar dinheiro), compra de itens a debitar do saldo, e sugestão de compra baseada em prioridade + orçamento (algoritmo de knapsack 0/1)
 - [ ] **Fase 3 — Parsing de links:** dado um URL, extrair nome/preço/imagem automaticamente
 - [ ] **Fase 4 — Mobile:** empacotar para Android e, mais tarde, iOS
 
@@ -29,6 +29,7 @@ wishlist-app/
 ├── database.py         # ligação e queries à base de dados
 ├── suggestions.py      # algoritmo de sugestão de compra (knapsack 0/1)
 ├── schema.sql          # definição das tabelas
+├── init_db.py           # (re)cria a base de dados a partir do schema.sql
 ├── wishlist.db          # ficheiro da base de dados (gerado)
 ├── templates/
 │   ├── index.html       # lista de itens
@@ -75,11 +76,18 @@ wishlist-app/
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+python3 init_db.py     # cria/recria a base de dados a partir do schema.sql
 python3 app.py
 ```
 
 A app fica disponível em `http://127.0.0.1:5000`.
 
+## Funcionalidades da Fase 2
+
+- **Sugestão de compra na página principal:** dado o saldo atual, o algoritmo de knapsack 0/1 escolhe os itens (por comprar) que maximizam a prioridade total sem ultrapassar o saldo disponível
+- **Mealheiro:** um único formulário permite depositar ou retirar dinheiro (rota `/movimento`), guardando cada movimento em `movements`
+- **Marcar como comprado:** cada item por comprar tem um botão que o marca como comprado, define `purchased_at` e regista automaticamente o movimento de compra (dedução do saldo)
+
 ## Estado atual
 
-🚧 Em desenvolvimento — Fase 2 (orçamento e sugestão de compra).
+✅ Fase 2 concluída — a começar a Fase 3 (parsing automático de links).
