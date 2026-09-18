@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from database import get_db
+from suggestions import sugerir_compra
 
 app = Flask(__name__)
 
@@ -73,6 +74,25 @@ def edit_item(item_id):
     conn.commit()
     conn.close()
     return redirect(url_for("index"))
+
+
+@app.route('/sugestao')
+def sugestao():
+    db = get_db()
+    itens = db.execute(
+        'SELECT * FROM items WHERE purchased = 0'
+    ).fetchall()
+
+    saldo_atual = db.execute(
+        'SELECT COALESCE(SUM(amount), 0) as saldo FROM movements'
+    ).fetchone()['saldo']
+
+    # Converter rows do SQLite para dicts simples
+    itens_dict = [dict(item) for item in itens]
+
+    prioridade_total, escolhidos = sugerir_compra(itens_dict, saldo_atual)
+
+    return render_template('sugestao.html', escolhidos=escolhidos, prioridade_total=prioridade_total, saldo=saldo_atual)
 
 
 if __name__ == "__main__":

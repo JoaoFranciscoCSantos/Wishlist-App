@@ -4,18 +4,18 @@ Aplicação pessoal para gerir uma wishlist de objetos, viagens e outros interes
 
 ## Objetivo
 
-Guardar tudo o que quero comprar/fazer num só sítio, acompanhar quanto já tenho poupado para cada coisa, e no futuro conseguir colar um link de uma loja/site e a app extrair automaticamente o nome, preço e imagem do produto.
+Guardar tudo o que quero comprar/fazer num só sítio, acompanhar quanto já tenho poupado, e no futuro conseguir colar um link de uma loja/site e a app extrair automaticamente o nome, preço e imagem do produto.
 
 ## Roteiro
 
-- [x] **Fase 1 — MVP local:** base de dados + site simples onde adiciono itens manualmente
-- [ ] **Fase 2 — Orçamento:** medidor de dinheiro, progresso de poupança por item, prioridades
+- [x] **Fase 1 — MVP local:** base de dados + site simples onde adiciono itens manualmente (CRUD completo + CSS)
+- [ ] **Fase 2 — Orçamento:** mealheiro único (adicionar/retirar dinheiro), compra de itens a debitar do saldo, e sugestão de compra baseada em prioridade + orçamento (algoritmo de knapsack 0/1)
 - [ ] **Fase 3 — Parsing de links:** dado um URL, extrair nome/preço/imagem automaticamente
 - [ ] **Fase 4 — Mobile:** empacotar para Android e, mais tarde, iOS
 
 *(Este projeto está a ser construído de forma incremental — cada fase só avança depois da anterior estar sólida.)*
 
-## Stack (Fase 1)
+## Stack
 
 - **Backend:** Python + Flask
 - **Base de dados:** SQLite
@@ -27,11 +27,13 @@ Guardar tudo o que quero comprar/fazer num só sítio, acompanhar quanto já ten
 wishlist-app/
 ├── app.py              # aplicação Flask (rotas)
 ├── database.py         # ligação e queries à base de dados
-├── schema.sql           # definição das tabelas
+├── suggestions.py      # algoritmo de sugestão de compra (knapsack 0/1)
+├── schema.sql          # definição das tabelas
 ├── wishlist.db          # ficheiro da base de dados (gerado)
 ├── templates/
 │   ├── index.html       # lista de itens
-│   └── add.html         # formulário de adicionar item
+│   ├── add.html         # formulário de adicionar item
+│   └── edit.html         # formulário de editar item
 ├── static/
 │   └── style.css
 ├── requirements.txt
@@ -42,25 +44,30 @@ wishlist-app/
 
 **items**
 
-| campo       | tipo    | descrição                              |
-|-------------|---------|-----------------------------------------|
-| id          | INTEGER | chave primária                          |
-| name        | TEXT    | nome do item                            |
-| category    | TEXT    | "objeto", "viagem" ou "interesse"       |
-| price       | REAL    | preço estimado                          |
-| url         | TEXT    | link do produto (opcional)              |
-| image_url   | TEXT    | imagem (opcional)                       |
-| notes       | TEXT    | notas livres                            |
-| priority    | INTEGER | usado para ordenar a wishlist           |
-| created_at  | TEXT    | data de criação                         |
+| campo         | tipo    | descrição                              |
+|---------------|---------|-----------------------------------------|
+| id            | INTEGER | chave primária                          |
+| name          | TEXT    | nome do item                            |
+| category      | TEXT    | "objeto", "viagem" ou "interesse"       |
+| price         | REAL    | preço estimado                          |
+| url           | TEXT    | link do produto (opcional)              |
+| image_url     | TEXT    | imagem (opcional)                       |
+| notes         | TEXT    | notas livres                            |
+| priority      | INTEGER | usado para ordenar a wishlist e nas sugestões de compra |
+| purchased     | INTEGER | 0 = por comprar, 1 = já comprado        |
+| purchased_at  | TEXT    | data em que foi marcado como comprado   |
+| created_at    | TEXT    | data de criação                         |
 
-**savings**
+**movements** (histórico de entradas/saídas do mealheiro; o saldo atual é a soma de todos os `amount`)
 
-| campo   | tipo    | descrição            |
-|---------|---------|-----------------------|
-| id      | INTEGER | chave primária        |
-| amount  | REAL    | valor poupado         |
-| date    | TEXT    | data                  |
+| campo       | tipo    | descrição                                              |
+|-------------|---------|----------------------------------------------------------|
+| id          | INTEGER | chave primária                                          |
+| amount      | REAL    | positivo = depósito, negativo = retirada ou compra      |
+| type        | TEXT    | "deposit", "withdrawal" ou "purchase"                   |
+| item_id     | INTEGER | preenchido apenas quando `type = "purchase"`             |
+| note        | TEXT    | nota opcional                                            |
+| created_at  | TEXT    | data do movimento                                        |
 
 ## Como correr localmente
 
@@ -75,4 +82,4 @@ A app fica disponível em `http://127.0.0.1:5000`.
 
 ## Estado atual
 
-🚧 Em desenvolvimento — Fase 1 (MVP local).
+🚧 Em desenvolvimento — Fase 2 (orçamento e sugestão de compra).
