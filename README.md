@@ -8,7 +8,7 @@ Guardar tudo o que quero comprar/fazer num só sítio, acompanhar quanto já ten
 
 ## Roteiro
 
-- [ ] **Fase 1 — MVP local:** base de dados + site simples onde adiciono itens manualmente
+- [x] **Fase 1 — MVP local:** base de dados + site simples onde adiciono itens manualmente
 - [ ] **Fase 2 — Orçamento:** medidor de dinheiro, progresso de poupança por item, prioridades
 - [ ] **Fase 3 — Parsing de links:** dado um URL, extrair nome/preço/imagem automaticamente
 - [ ] **Fase 4 — Mobile:** empacotar para Android e, mais tarde, iOS
