@@ -8,6 +8,13 @@
 <body>
 
     <h1>A minha Wishlist</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p class="erro">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     <a href="{{ url_for('add_form') }}">+ Adicionar item</a>
 

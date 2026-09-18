@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from database import get_db
 from suggestions import sugerir_compra
 
 app = Flask(__name__)
+app.secret_key = "algo_qualquer"
 
 @app.route("/")
 def index():
@@ -147,10 +148,21 @@ def movimento():
     note = request.form.get("note")
     tipo = request.form["tipo"]  # 'deposit' ou 'withdrawal'
 
-    if tipo == "withdrawal":
-        amount = -amount
-
     conn = get_db()
+
+
+    if tipo == "withdrawal":
+        saldo_atual = conn.execute(
+            "SELECT COALESCE(SUM(amount), 0) as saldo FROM movements"
+        ).fetchone()["saldo"]
+
+        if amount > saldo_atual:
+            flash("Saldo insuficiente para esta retirada.")
+            conn.close()
+            return redirect(url_for("index"))
+
+        amount = -amount
+    
     conn.execute(
         "INSERT INTO movements (amount, type, note) VALUES (?, ?, ?)",
         (amount, tipo, note)
