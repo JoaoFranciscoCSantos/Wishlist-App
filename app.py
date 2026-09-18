@@ -10,8 +10,25 @@ def index():
     items = conn.execute(
         "SELECT * FROM items ORDER BY priority DESC, created_at DESC"
     ).fetchall()
+
+    itens_por_comprar = conn.execute(
+        "SELECT * FROM items WHERE purchased = 0"
+    ).fetchall()
+    saldo_atual = conn.execute(
+        "SELECT COALESCE(SUM(amount), 0) as saldo FROM movements"
+    ).fetchone()["saldo"]
+
+    itens_dict = [dict(item) for item in itens_por_comprar]
+    prioridade_total, escolhidos = sugerir_compra(itens_dict, saldo_atual)
+
     conn.close()
-    return render_template("index.html", items=items)
+    return render_template(
+        "index.html",
+        items=items,
+        escolhidos=escolhidos,
+        prioridade_total=prioridade_total,
+        saldo=saldo_atual
+    )
 
 
 @app.route("/add", methods=["GET"])
@@ -87,12 +104,78 @@ def sugestao():
         'SELECT COALESCE(SUM(amount), 0) as saldo FROM movements'
     ).fetchone()['saldo']
 
-    # Converter rows do SQLite para dicts simples
     itens_dict = [dict(item) for item in itens]
-
     prioridade_total, escolhidos = sugerir_compra(itens_dict, saldo_atual)
+    db.close()  # <-- adicionar isto
 
     return render_template('sugestao.html', escolhidos=escolhidos, prioridade_total=prioridade_total, saldo=saldo_atual)
+
+
+@app.route("/deposito", methods=["POST"])
+def deposito():
+    amount = float(request.form["amount"])
+    note = request.form.get("note")
+
+    conn = get_db()
+    conn.execute(
+        "INSERT INTO movements (amount, type, note) VALUES (?, ?, ?)",
+        (amount, "deposit", note)
+    )
+    conn.commit()
+    conn.close()
+    return redirect(url_for("index"))
+
+
+@app.route("/retirada", methods=["POST"])
+def retirada():
+    amount = float(request.form["amount"])
+    note = request.form.get("note")
+
+    conn = get_db()
+    conn.execute(
+        "INSERT INTO movements (amount, type, note) VALUES (?, ?, ?)",
+        (-amount, "withdrawal", note)
+    )
+    conn.commit()
+    conn.close()
+    return redirect(url_for("index"))
+
+
+@app.route("/movimento", methods=["POST"])
+def movimento():
+    amount = float(request.form["amount"])
+    note = request.form.get("note")
+    tipo = request.form["tipo"]  # 'deposit' ou 'withdrawal'
+
+    if tipo == "withdrawal":
+        amount = -amount
+
+    conn = get_db()
+    conn.execute(
+        "INSERT INTO movements (amount, type, note) VALUES (?, ?, ?)",
+        (amount, tipo, note)
+    )
+    conn.commit()
+    conn.close()
+    return redirect(url_for("index"))
+
+
+@app.route("/comprar/<int:item_id>", methods=["POST"])
+def comprar(item_id):
+    conn = get_db()
+    item = conn.execute("SELECT * FROM items WHERE id = ?", (item_id,)).fetchone()
+
+    conn.execute(
+        "UPDATE items SET purchased = 1, purchased_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (item_id,)
+    )
+    conn.execute(
+        "INSERT INTO movements (amount, type, item_id) VALUES (?, ?, ?)",
+        (-item["price"], "purchase", item_id)
+    )
+    conn.commit()
+    conn.close()
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":

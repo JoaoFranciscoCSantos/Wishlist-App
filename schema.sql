@@ -7,15 +7,9 @@ CREATE TABLE IF NOT EXISTS items(
     image_url TEXT,
     notes TEXT,
     priority INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     purchased INTEGER DEFAULT 0,
     purchased_at TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS savings(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    amount REAL NOT NULL,
-    date TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE movements (
