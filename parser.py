@@ -73,13 +73,14 @@ def extrair_json_ld(soup):
 
             nome = produto.get("name")
             imagem = produto.get("image")
-            if isinstance(imagem, list):
-                imagem = imagem[0] if imagem else None
 
             preco = None
             moeda = None
 
             offers = produto.get("offers")
+
+            if isinstance(offers, list):
+                offers = offers[0] if offers else None
 
             if isinstance(offers, dict):
                 preco = offers.get("price")
@@ -243,7 +244,75 @@ def extrair_tradeinn(soup):
         "image_url": extrair_meta(soup, "og:image"),
     }
 
+
+def normalizar_preco(valor):
+    """
+    Converte qualquer formato de preço para float.
+    Devolve None se não for possível.
+    """
+    if valor is None or isinstance(valor, bool):
+        return None
+
+    if isinstance(valor, (int, float)):
+        return float(valor)
+
+    if not isinstance(valor, str):
+        return None
+
+    # Remove €, espaços, letras, etc. Fica só com dígitos, '.' e ','
+    texto = re.sub(r"[^\d.,]", "", valor)
+
+    if not texto:
+        return None
+
+    if "." in texto and "," in texto:
+        # O separador que aparece por último é o decimal
+        if texto.rfind(",") > texto.rfind("."):
+            # "1.299,99" -> "1299.99"
+            texto = texto.replace(".", "").replace(",", ".")
+        else:
+            # "1,299.99" -> "1299.99"
+            texto = texto.replace(",", "")
+    elif "," in texto:
+        # "29,99" -> "29.99"
+        texto = texto.replace(",", ".")
+
+    try:
+        return float(texto)
+    except ValueError:
+        return None
+
+
+def normalizar_imagem(valor):
+    """
+    Devolve sempre uma string com o URL da imagem, ou None.
+    Aceita string, lista ou dicionário (ImageObject).
+    """
+    if isinstance(valor, list):
+        valor = valor[0] if valor else None
+
+    if isinstance(valor, dict):
+        valor = valor.get("url") or valor.get("contentUrl")
+
+    if isinstance(valor, str) and valor.strip():
+        return valor.strip()
+
+    return None
+
+
 def extrair_produto(url):
+    """
+    Ponto de entrada público: devolve sempre dados normalizados.
+    """
+    dados = extrair_produto_bruto(url)
+
+    dados["price"] = normalizar_preco(dados["price"])
+    dados["image_url"] = normalizar_imagem(dados["image_url"])
+
+    return dados
+
+
+def extrair_produto_bruto(url):
     resposta = requests.get(
         url,
         headers=HEADERS,
