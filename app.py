@@ -44,18 +44,22 @@ def add_form():
 def add_item():
     name = request.form["name"]
     category = request.form["category"]
-    price = float(request.form["price"])
-    url = request.form.get("url")
-    notes = request.form.get("notes")
-    priority = int(request.form.get("priority", 0))
+    price = request.form.get("price") or None
+    url = request.form.get("url") or None
+    image_url = request.form.get("image_url") or None
+    notes = request.form.get("notes") or None
+    priority = request.form.get("priority", 0)
 
-    conn = get_db()
-    conn.execute(
-        "INSERT INTO items (name, category, price, url, notes, priority) VALUES (?, ?, ?, ?, ?, ?)",
-        (name, category, price, url, notes, priority)
+    db = get_db()
+    db.execute(
+        """
+        INSERT INTO items (name, category, price, url, image_url, notes, priority)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (name, category, price, url, image_url, notes, priority),
     )
-    conn.commit()
-    conn.close()
+    db.commit()
+
     return redirect(url_for("index"))
 
 

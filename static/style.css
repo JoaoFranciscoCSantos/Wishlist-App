@@ -134,6 +134,12 @@ button:active {
 }
 
 /* ===== Wishlist ===== */
+.item-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
 .item-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

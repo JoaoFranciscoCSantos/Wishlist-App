@@ -21,9 +21,14 @@
     <div class="item-list">
         {% for item in items %}
             <div class="item-card">
+                {% if item["image_url"] %}
+                    <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}" class="item-img">
+                {% endif %}
                 <h3>{{ item["name"] }}</h3>
                 <p>Categoria: {{ item["category"] }}</p>
-                <p>Preço: {{ item["price"] }} €</p>
+                {% if item["price"] is not none %}
+                    <p>Preço: {{ item["price"] }} €</p>
+                {% endif %}
                 {% if item["url"] %}
                     <p><a href="{{ item['url'] }}" target="_blank">Ver produto</a></p>
                 {% endif %}
@@ -47,7 +52,6 @@
             </div>
         {% else %}
             <p>A tua wishlist está vazia. <a href="{{ url_for('add_form') }}">Adiciona o primeiro item</a>.</p>
-
             <div class="item">
                 <span>{{ item.name }} — {{ item.price }}€</span>
                 {% if not item.purchased %}
