@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from database import get_db
 from suggestions import sugerir_compra
+import requests
+from parser import extrair_produto
+
+VAZIO = {"name": None, "price": None, "currency": None, "image_url": None}
 
 app = Flask(__name__)
 app.secret_key = "algo_qualquer"
@@ -34,8 +38,7 @@ def index():
 
 @app.route("/add", methods=["GET"])
 def add_form():
-    return render_template("add.html")
-
+    return render_template("add.html", produto={}, url="")
 
 @app.route("/add", methods=["POST"])
 def add_item():
@@ -188,6 +191,29 @@ def comprar(item_id):
     conn.commit()
     conn.close()
     return redirect(url_for("index"))
+
+
+@app.route("/analisar", methods=["POST"])
+def analisar():
+    url = request.form.get("url", "").strip()
+
+    if not url:
+        flash("Cola um URL para analisar.")
+        return redirect(url_for("add_form"))
+
+    try:
+        produto = extrair_produto(url)
+    except requests.RequestException:
+        flash("Não foi possível ler esta página. Preenche os dados manualmente.")
+        produto = VAZIO
+    except Exception:
+        flash("Erro ao analisar a página. Preenche os dados manualmente.")
+        produto = VAZIO
+
+    if produto["name"] is None and produto["price"] is None:
+        flash("Não foi encontrada informação do produto. Preenche manualmente.")
+
+    return render_template("add.html", produto=produto, url=url)
 
 
 if __name__ == "__main__":

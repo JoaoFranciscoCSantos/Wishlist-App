@@ -9,10 +9,26 @@
 
     <h1>Adicionar à wishlist</h1>
 
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p class="flash">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('analisar') }}">
+        <label for="analisar_url">Colar link do produto</label>
+        <input type="url" id="analisar_url" name="url" placeholder="https://..." value="{{ url }}">
+        <button type="submit">Analisar</button>
+    </form>
+
+    <hr>
+
     <form method="POST" action="{{ url_for('add_item') }}">
 
         <label for="name">Nome</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" value="{{ produto.name or '' }}" required>
 
         <label for="category">Categoria</label>
         <select id="category" name="category">
@@ -22,10 +38,15 @@
         </select>
 
         <label for="price">Preço (€)</label>
-        <input type="number" id="price" name="price" step="0.01" min="0">
+        <input type="number" id="price" name="price" step="0.01" min="0" value="{{ produto.price if produto.price is not none else '' }}">
 
         <label for="url">Link (opcional)</label>
-        <input type="url" id="url" name="url">
+        <input type="url" id="url" name="url" value="{{ url }}">
+
+        {% if produto.image_url %}
+            <img src="{{ produto.image_url }}" alt="Pré-visualização" style="max-width: 200px;">
+        {% endif %}
+        <input type="hidden" name="image_url" value="{{ produto.image_url or '' }}">
 
         <label for="notes">Notas</label>
         <textarea id="notes" name="notes"></textarea>
