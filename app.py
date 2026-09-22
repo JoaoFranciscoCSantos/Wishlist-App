@@ -92,15 +92,17 @@ def edit_form(item_id):
 def edit_item(item_id):
     name = request.form["name"]
     category = request.form["category"]
-    price = float(request.form["price"])
-    url = request.form.get("url")
-    notes = request.form.get("notes")
+    price = request.form.get("price") or None
+    price = float(price) if price is not None else None
+    url = request.form.get("url") or None
+    image_url = request.form.get("image_url") or None
+    notes = request.form.get("notes") or None
     priority = int(request.form.get("priority", 1))
 
     conn = get_db()
     conn.execute(
-        "UPDATE items SET name = ?, category = ?, price = ?, url = ?, notes = ?, priority = ? WHERE id = ?",
-        (name, category, price, url, notes, priority, item_id)
+        "UPDATE items SET name = ?, category = ?, price = ?, url = ?, image_url = ?, notes = ?, priority = ? WHERE id = ?",
+        (name, category, price, url, image_url, notes, priority, item_id)
     )
     conn.commit()
     conn.close()
