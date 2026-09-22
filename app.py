@@ -72,7 +72,7 @@ def delete_item(item_id):
         conn.commit()
     except sqlite3.IntegrityError:
         conn.rollback()
-        flash("Não é possível apagar: este item tem movimentos associados.")
+        flash("Não é possível apagar este item.")
     finally:
         conn.close()
     return redirect(url_for("index"))

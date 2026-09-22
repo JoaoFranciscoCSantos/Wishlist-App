@@ -19,5 +19,5 @@ CREATE TABLE movements (
     item_id INTEGER,             -- só preenchido quando type = 'purchase'
     note TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (item_id) REFERENCES items(id)
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE SET NULL
 );
