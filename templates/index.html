@@ -52,16 +52,6 @@
             </div>
         {% else %}
             <p>A tua wishlist está vazia. <a href="{{ url_for('add_form') }}">Adiciona o primeiro item</a>.</p>
-            <div class="item">
-                <span>{{ item.name }} — {{ item.price }}€</span>
-                {% if not item.purchased %}
-                    <form action="{{ url_for('comprar', item_id=item.id) }}" method="POST" style="display:inline;">
-                        <button type="submit">Marcar como comprado</button>
-                    </form>
-                {% else %}
-                    <span>✅ Comprado</span>
-                {% endif %}
-            </div>
         {% endfor %}
     </div>
 
