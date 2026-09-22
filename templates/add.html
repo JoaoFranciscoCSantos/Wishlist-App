@@ -37,6 +37,10 @@
             <option value="interesse">Interesse</option>
         </select>
 
+        {% if produto.currency and produto.currency != "EUR" %}
+            <p class="aviso">⚠️ Preço encontrado em {{ produto.currency }}. Confirma e converte para euros antes de guardar.</p>
+        {% endif %}
+
         <label for="price">Preço (€)</label>
         <input type="number" id="price" name="price" step="0.01" min="0" value="{{ produto.price if produto.price is not none else '' }}">
 
