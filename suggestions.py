@@ -1,8 +1,10 @@
 def sugerir_compra(itens, saldo):
+    itens_com_preco = [item for item in itens if item['price'] is not None]
+
     saldo_centimos = round(saldo * 100)
-    precos_centimos = [round(item['price'] * 100) for item in itens]
-    prioridades = [item['priority'] for item in itens]
-    n = len(itens)
+    precos_centimos = [round(item['price'] * 100) for item in itens_com_preco]
+    prioridades = [item['priority'] for item in itens_com_preco]
+    n = len(itens_com_preco)
 
     dp = [[0] * (saldo_centimos + 1) for _ in range(n + 1)]
 
@@ -21,8 +23,8 @@ def sugerir_compra(itens, saldo):
     s = saldo_centimos
     for i in range(n, 0, -1):
         if dp[i][s] != dp[i - 1][s]:
-            escolhidos.append(itens[i - 1])
-            s -= precos_centimos[i - 1]
+            escolhidos.append(itens_com_preco[i - 1])
+        s -= precos_centimos[i - 1]
 
     escolhidos.reverse()
     return dp[n][saldo_centimos], escolhidos

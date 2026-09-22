@@ -3,6 +3,7 @@ from database import get_db
 from suggestions import sugerir_compra
 import requests
 from parser import extrair_produto
+import sqlite3
 
 VAZIO = {"name": None, "price": None, "currency": None, "image_url": None}
 
@@ -66,9 +67,14 @@ def add_item():
 @app.route("/delete/<int:item_id>", methods=["POST"])
 def delete_item(item_id):
     conn = get_db()
-    conn.execute("DELETE FROM items WHERE id = ?", (item_id,))
-    conn.commit()
-    conn.close()
+    try:
+        conn.execute("DELETE FROM items WHERE id = ?", (item_id,))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.rollback()
+        flash("Não é possível apagar: este item tem movimentos associados.")
+    finally:
+        conn.close()
     return redirect(url_for("index"))
 
 
@@ -183,6 +189,11 @@ def movimento():
 def comprar(item_id):
     conn = get_db()
     item = conn.execute("SELECT * FROM items WHERE id = ?", (item_id,)).fetchone()
+
+    if item is None:
+        conn.close()
+        flash("Item não encontrado.")
+        return redirect(url_for("index"))
 
     conn.execute(
         "UPDATE items SET purchased = 1, purchased_at = CURRENT_TIMESTAMP WHERE id = ?",
