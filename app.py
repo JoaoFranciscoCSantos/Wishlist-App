@@ -199,10 +199,13 @@ def comprar(item_id):
         "UPDATE items SET purchased = 1, purchased_at = CURRENT_TIMESTAMP WHERE id = ?",
         (item_id,)
     )
-    conn.execute(
-        "INSERT INTO movements (amount, type, item_id) VALUES (?, ?, ?)",
-        (-item["price"], "purchase", item_id)
-    )
+
+    if item["price"] is not None:
+        conn.execute(
+            "INSERT INTO movements (amount, type, item_id) VALUES (?, ?, ?)",
+            (-item["price"], "purchase", item_id)
+        )
+
     conn.commit()
     conn.close()
     return redirect(url_for("index"))
