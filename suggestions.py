@@ -2,6 +2,9 @@ def sugerir_compra(itens, saldo):
     itens_com_preco = [item for item in itens if item['price'] is not None]
 
     saldo_centimos = round(saldo * 100)
+    if saldo_centimos <= 0:
+        return 0, []
+    
     precos_centimos = [round(item['price'] * 100) for item in itens_com_preco]
     prioridades = [item['priority'] for item in itens_com_preco]
     n = len(itens_com_preco)
