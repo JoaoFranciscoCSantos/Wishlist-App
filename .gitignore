@@ -1,0 +1,7 @@
+wishlist.db
+wishlist.db.backup
+wishlist.db-journal
+wishlist.db-wal
+wishlist.db-shm
+venv/
+__pycache__/
