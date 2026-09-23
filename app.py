@@ -4,6 +4,13 @@ from suggestions import sugerir_compra
 import requests
 from parser import extrair_produto
 import sqlite3
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = Flask(__name__)
+app.secret_key = os.environ["FLASK_SECRET_KEY"]
 
 VAZIO = {"name": None, "price": None, "currency": None, "image_url": None}
 
@@ -249,4 +256,4 @@ def service_worker():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
