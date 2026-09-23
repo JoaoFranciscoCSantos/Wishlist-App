@@ -64,7 +64,7 @@ if ("serviceWorker" in navigator) {
     </div>
 
     <div class="mealheiro">
-        <h3>Saldo: {{ saldo }}€</h3>
+        <h3>Saldo: {{ "%.2f"|format(saldo) }}€</h3>
 
         <form action="{{ url_for('movimento') }}" method="POST">
             <input type="number" name="amount" step="0.01" min="0.01" required placeholder="Valor">

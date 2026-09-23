@@ -10,6 +10,14 @@ VAZIO = {"name": None, "price": None, "currency": None, "image_url": None}
 app = Flask(__name__)
 app.secret_key = "algo_qualquer"
 
+
+def get_saldo(conn):
+    saldo = conn.execute(
+        "SELECT COALESCE(SUM(amount), 0) as saldo FROM movements"
+    ).fetchone()["saldo"]
+    return round(saldo, 2)
+
+
 @app.route("/")
 def index():
     conn = get_db()
@@ -20,10 +28,9 @@ def index():
     itens_por_comprar = conn.execute(
         "SELECT * FROM items WHERE purchased = 0"
     ).fetchall()
-    saldo_atual = conn.execute(
-        "SELECT COALESCE(SUM(amount), 0) as saldo FROM movements"
-    ).fetchone()["saldo"]
 
+    saldo_atual = get_saldo(conn)
+    
     itens_dict = [dict(item) for item in itens_por_comprar]
     prioridade_total, escolhidos = sugerir_compra(itens_dict, saldo_atual)
 
@@ -116,9 +123,7 @@ def sugestao():
         'SELECT * FROM items WHERE purchased = 0'
     ).fetchall()
 
-    saldo_atual = db.execute(
-        'SELECT COALESCE(SUM(amount), 0) as saldo FROM movements'
-    ).fetchone()['saldo']
+    saldo_atual = get_saldo(db)
 
     itens_dict = [dict(item) for item in itens]
     prioridade_total, escolhidos = sugerir_compra(itens_dict, saldo_atual)
@@ -167,9 +172,7 @@ def movimento():
 
 
     if tipo == "withdrawal":
-        saldo_atual = conn.execute(
-            "SELECT COALESCE(SUM(amount), 0) as saldo FROM movements"
-        ).fetchone()["saldo"]
+        saldo_atual = get_saldo(conn)
 
         if amount > saldo_atual:
             flash("Saldo insuficiente para esta retirada.")
