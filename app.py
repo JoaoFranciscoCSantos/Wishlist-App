@@ -250,10 +250,12 @@ def analisar():
 def manifest():
     return send_from_directory(".", "manifest.json")
 
+
 @app.route("/service-worker.js")
 def service_worker():
     return send_from_directory(".", "service-worker.js", mimetype="application/javascript")
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
+    app.run(host="0.0.0.0", port=5000, debug=debug_mode)
