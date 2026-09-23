@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <title>A minha Wishlist</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4f46e5">
 </head>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+}
+</script>
 <body>
 
     <h1>A minha Wishlist</h1>

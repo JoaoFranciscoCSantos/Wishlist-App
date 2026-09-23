@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
 from database import get_db
 from suggestions import sugerir_compra
 import requests
@@ -236,5 +236,14 @@ def analisar():
     return render_template("add.html", produto=produto, url=url)
 
 
+@app.route("/manifest.json")
+def manifest():
+    return send_from_directory(".", "manifest.json")
+
+@app.route("/service-worker.js")
+def service_worker():
+    return send_from_directory(".", "service-worker.js", mimetype="application/javascript")
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
